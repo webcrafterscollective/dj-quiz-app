@@ -1,0 +1,49 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<article class="grid">
+    <div>
+        <hgroup>
+            <h1>Sign in</h1>
+            <h2>Enter your credentials to access your quizzes.</h2>
+        </hgroup>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Display Non-Field Errors -->
+            {% if form.non_field_errors %}
+                <div class="error-message">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Username Field -->
+            <label for="id_username">Username</label>
+            <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username">
+
+            <!-- Password Field -->
+            <label for="id_password">Password</label>
+            <input type="password" name="password" autocomplete="current-password" required id="id_password">
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <div></div>
+</article>
+
+<style>
+    .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: .25rem;
+    }
+</style>
+{% endblock %}

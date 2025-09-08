@@ -1,0 +1,22 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}{{ quiz.title }}{% endblock %}
+
+{% block content %}
+    <article>
+        <header>
+            <h2>{{ quiz.title }}</h2>
+        </header>
+        <p>{{ quiz.description }}</p>
+        <footer>
+            <ul>
+                <li><strong>Duration:</strong> {{ quiz.duration }}</li>
+                <li><strong>Number of Questions:</strong> {{ quiz.questions.count }}</li>
+            </ul>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit">Start Quiz</button>
+            </form>
+        </footer>
+    </article>
+{% endblock %}

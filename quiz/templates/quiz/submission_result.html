@@ -1,0 +1,26 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Submission Received{% endblock %}
+
+{% block content %}
+    <article>
+        <header>
+            <h2>Quiz Submitted Successfully!</h2>
+        </header>
+        <p>Thank you for taking the quiz: <strong>{{ submission.quiz.title }}</strong>.</p>
+        
+        {% if submission.status == 'SUBMITTED' %}
+            <p>Your answers have been recorded. As this quiz contains questions that require manual review, your final results will be available in your "My History" page once grading is complete.</p>
+        {% elif submission.status == 'COMPLETED' %}
+            <p>Your quiz has been automatically graded! Your results are ready to be viewed.</p>
+        {% endif %}
+        
+        <footer>
+            {% if submission.status == 'COMPLETED' %}
+                <a href="{% url 'quiz:submission_detail' submission.id %}" role="button">View My Results</a>
+            {% endif %}
+            <a href="{% url 'quiz:quiz_list' %}" role="button" class="secondary">Back to Quiz List</a>
+        </footer>
+    </article>
+{% endblock %}
+

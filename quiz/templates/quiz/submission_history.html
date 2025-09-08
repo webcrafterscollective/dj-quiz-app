@@ -1,0 +1,53 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}My Submission History{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h2>My Submission History</h2>
+    </header>
+
+    {% if submissions %}
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Quiz Title</th>
+                    <th scope="col">Submitted On</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sub in submissions %}
+                <tr>
+                    <td>{{ sub.quiz.title }}</td>
+                    <td>{{ sub.start_time|date:"Y-m-d H:i" }}</td>
+                    <td>{{ sub.get_status_display }}</td>
+                    <td>
+                        {% if sub.status == 'COMPLETED' %}
+                            {{ sub.score|floatformat:2 }}
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if sub.status == 'COMPLETED' %}
+                            <a href="{% url 'quiz:submission_detail' sub.id %}" role="button" class="outline">View Results</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have not submitted any quizzes yet.</p>
+    {% endif %}
+
+    <a href="{% url 'quiz:quiz_list' %}" role="button">Back to Quiz List</a>
+
+</article>
+{% endblock %}

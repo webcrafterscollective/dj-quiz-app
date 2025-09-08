@@ -1,0 +1,72 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Taking: {{ quiz.title }}{% endblock %}
+
+{% block content %}
+    <article>
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>{{ quiz.title }}</h2>
+                <h3 id="timer"></h3>
+            </div>
+        </header>
+
+        <form id="quiz-form" method="post">
+            {% csrf_token %}
+            {% for question in questions %}
+                <fieldset>
+                    <legend>{{ forloop.counter }}. {{ question.question_text }} ({{question.points}} Points)</legend>
+                    
+                    {% if question.question_type == 'MCQ' %}
+                        {% for choice in question.choices.all %}
+                            <label>
+                                <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}">
+                                {{ choice.choice_text }}
+                            </label>
+                        {% endfor %}
+                    
+                    {% elif question.question_type == 'MSQ' %}
+                        {% for choice in question.choices.all %}
+                            <label>
+                                <input type="checkbox" name="question_{{ question.id }}" value="{{ choice.id }}">
+                                {{ choice.choice_text }}
+                            </label>
+                        {% endfor %}
+
+                    {% elif question.question_type == 'CODE' %}
+                        <textarea name="question_{{ question.id }}" rows="10" placeholder="Write your code here..."></textarea>
+                    
+                    {% endif %}
+                </fieldset>
+                <hr>
+            {% endfor %}
+
+            <button type="submit">Submit Quiz</button>
+        </form>
+    </article>
+
+    <script>
+        const timeLeft = {{ time_left_seconds }};
+        const timerElement = document.getElementById('timer');
+        const quizForm = document.getElementById('quiz-form');
+        let countdown = timeLeft;
+
+        function updateTimer() {
+            const minutes = Math.floor(countdown / 60);
+            let seconds = countdown % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            timerElement.textContent = `Time Left: ${minutes}:${seconds}`;
+
+            if (countdown <= 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = "Time's up!";
+                quizForm.submit();
+            }
+            countdown--;
+        }
+
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer(); // Initial call
+    </script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Submission Details for {{ submission.quiz.title }}{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h2>Results: {{ submission.quiz.title }}</h2>
+        <p>Submitted on: {{ submission.start_time|date:"F j, Y, P" }}</p>
+        {% if submission.status == 'COMPLETED' %}
+            <p><strong>Final Score: {{ submission.score|floatformat:2 }} / {{ total_points|floatformat:2 }}</strong></p>
+        {% else %}
+            <p><strong>Status:</strong> <mark>Pending Manual Grade</mark></p>
+            <p><strong>Current Auto-Graded Score:</strong> {{ submission.score|floatformat:2 }}</p>
+        {% endif %}
+    </header>
+
+    <hr>
+    
+    {# FIX: This template now loops over the simple data structure from the view #}
+    {% for question in questions_with_answers %}
+        <div class="question-review">
+            <h4>{{ forloop.counter }}. {{ question.text|default:"[Question text is missing]" }} ({{ question.points|floatformat:2 }} Points)</h4>
+            
+            {% with user_answer=question.user_answer %}
+                <div class="user-answer-box">
+                    <p><strong>Your Answer:</strong></p>
+                    {% if question.question_type == 'MCQ' or question.question_type == 'MSQ' %}
+                        <ul>
+                        {# Loop through the choices dictionary #}
+                        {% for choice in question.choices %}
+                            <li>
+                                <input 
+                                    type="{% if question.question_type == 'MCQ' %}radio{% else %}checkbox{% endif %}" 
+                                    id="choice_{{ choice.id }}" 
+                                    name="question_{{ question.id }}" 
+                                    value="{{ choice.id }}"
+                                    {% if choice.id in question.selected_choice_ids %}checked{% endif %}
+                                    disabled
+                                >
+                                <label 
+                                    for="choice_{{ choice.id }}"
+                                    class="
+                                        {% if choice.is_correct and choice.id in question.selected_choice_ids %}correct-choice{% endif %}
+                                        {% if not choice.is_correct and choice.id in question.selected_choice_ids %}incorrect-choice{% endif %}
+                                        {% if choice.is_correct and choice.id not in question.selected_choice_ids %}missed-correct-choice{% endif %}
+                                    "
+                                >
+                                    {{ choice.text|default:"[Choice text is missing]" }}
+                                    {% if choice.is_correct %} (Correct Answer){% endif %}
+                                </label>
+                            </li>
+                        {% endfor %}
+                        </ul>
+
+                    {% elif question.question_type == 'CODE' %}
+                        <pre><code>{{ user_answer.code_answer|default:"No answer provided." }}</code></pre>
+                        {% if user_answer.points_awarded is not None %}
+                            <p><strong>Points Awarded:</strong> {{ user_answer.points_awarded|floatformat:2 }}</p>
+                        {% endif %}
+                        {% if user_answer.feedback %}
+                            <p><strong>Feedback:</strong></p>
+                            <blockquote>{{ user_answer.feedback }}</blockquote>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endwith %}
+        </div>
+        {% if not forloop.last %}<hr>{% endif %}
+    {% endfor %}
+
+    <footer>
+        <a href="{% url 'quiz:submission_history' %}" role="button" class="secondary">Back to My History</a>
+    </footer>
+</article>
+
+<style>
+    .question-review { margin-bottom: 2rem; }
+    .user-answer-box { 
+        background-color: var(--card-background-color);
+        border: 1px solid var(--card-border-color);
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        margin-top: 1rem;
+    }
+    .user-answer-box ul { list-style: none; padding: 0; }
+    .correct-choice { color: var(--pico-color-green-600); font-weight: bold; }
+    .incorrect-choice { color: var(--pico-color-red-600); text-decoration: line-through; }
+    .missed-correct-choice { color: var(--pico-color-green-600); opacity: 0.8; }
+</style>
+{% endblock %}
+
