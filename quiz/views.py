@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_4_4, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import Sum
@@ -12,6 +12,13 @@ def quiz_list(request):
 @login_required
 def quiz_detail(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk=quiz_id)
+    
+    # When the "Start Quiz" button is pressed, a POST request is sent.
+    # This block catches that request and redirects the user to the quiz-taking page.
+    if request.method == 'POST':
+        return redirect('quiz:take_quiz', quiz_id=quiz.id)
+    
+    # If it's a regular GET request, it just displays the quiz details as before.
     return render(request, 'quiz/quiz_detail.html', {'quiz': quiz})
 
 @login_required
@@ -48,10 +55,15 @@ def take_quiz(request, quiz_id):
                 user_answer.code_answer = code
                 user_answer.save()
         
-        submission.grade_mcq_msq()
+        # NOTE: You have a call to a method here that is not defined in your models.
+        # You will need to implement the grade_mcq_msq() method in your QuizSubmission model.
+        # submission.grade_mcq_msq() 
+        
         return redirect('quiz:submission_result', submission_id=submission.id)
 
-    return render(request, 'quiz/take_quiz.html', {'quiz': quiz, 'questions': questions})
+    # The time_left_seconds context variable is needed for the timer in your template
+    time_left_seconds = quiz.duration.total_seconds()
+    return render(request, 'quiz/take_quiz.html', {'quiz': quiz, 'questions': questions, 'time_left_seconds': time_left_seconds})
 
 @login_required
 def submission_result(request, submission_id):
@@ -95,7 +107,6 @@ def submission_detail(request, submission_id):
             })
         
         questions_data.append({
-            # FIX: Changed q.text to q.question_text to match your model
             'text': q.question_text,
             'points': q.points,
             'question_type': q.question_type,
@@ -110,4 +121,3 @@ def submission_detail(request, submission_id):
         'total_points': total_points,
     }
     return render(request, 'quiz/submission_detail.html', context)
-
