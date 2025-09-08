@@ -18,30 +18,29 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from a .env file for development and production
-load_dotenv(BASE_DIR / '.env')
+# Load environment variables from .env file if it exists.
+# This is used for production.
+dotenv_path = BASE_DIR / '.env'
+if dotenv_path.exists():
+    load_dotenv(dotenv_path)
 
 
-# --- Core Settings ---
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# This is loaded from the .env file.
-SECRET_KEY = os.environ.get('SECRET_KEY')
+# For local dev, we can use a simpler, non-secret key.
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-local-dev-key-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# The .env file should have DEBUG=False for production.
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-# Defines which host/domain names are allowed to serve this site.
-# Loaded from .env: ALLOWED_HOSTS=your_server_ip,yourdomain.com
+# Add your server's IP address or domain name here.
+# For local dev, 'localhost' and '127.0.0.1' are sufficient.
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
-ROOT_URLCONF = 'core.urls'
-WSGI_APPLICATION = 'core.wsgi.application'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# --- Application & Middleware Definitions ---
+# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -56,6 +55,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Whitenoise is for serving static files efficiently in production
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,8 +65,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
-# --- Templates ---
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -83,72 +83,100 @@ TEMPLATES = [
     },
 ]
 
-
-# --- Database Configuration ---
-
-# Use dj-database-url to parse the DATABASE_URL environment variable.
-# This allows easy switching between PostgreSQL in production and SQLite in development.
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
-        conn_max_age=600  # Persistent database connections
-    )
-}
+WSGI_APPLICATION = 'core.wsgi.application'
 
 
-# --- Password Validation ---
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
+# Smart database configuration:
+# If DATABASE_URL is in the environment, use it (for production).
+# Otherwise, fall back to SQLite (for local development).
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=False # Set to True if your DB requires SSL
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+
+# Password validation
+# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 
-# --- Internationalization ---
+# Internationalization
+# https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+
 TIME_ZONE = 'UTC'
-USE_I18N = True
+
+USE_I1एन = True
+
 USE_TZ = True
 
 
-# --- Static & Media Files ---
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-# The URL to access static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-# The absolute path to the directory where `collectstatic` will gather static files for production.
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# This is where 'collectstatic' will place all the static files.
+STATIC_ROOT = os.environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles')
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
-# The URL that media files are served from (user-uploaded content)
+# Media Files Configuration (for user-uploaded content)
 MEDIA_URL = '/media/'
-# The absolute path to the directory where user-uploaded files will be stored.
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', BASE_DIR / 'media')
 
 
-# --- Authentication ---
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# --- Login/Logout Redirects ---
 LOGIN_REDIRECT_URL = 'quiz:quiz_list'
 LOGIN_URL = 'login'
 
 
 # --- Production Security Settings ---
-# These settings should be enabled when DEBUG is False.
-
+# These settings will be active if DEBUG is False.
 if not DEBUG:
-    # Ensures that CSRF cookies are only sent over HTTPS.
-    CSRF_COOKIE_SECURE = True
-    
-    # Ensures that session cookies are only sent over HTTPS.
-    SESSION_COOKIE_SECURE = True
-    
-    # Redirects all non-HTTPS requests to HTTPS.
     SECURE_SSL_REDIRECT = True
-    
-    # HTTP Strict Transport Security (HSTS) settings.
-    # Tells the browser to always use HTTPS for the site.
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    # HSTS settings can be enabled after confirming your SSL setup is perfect.
+    # SECURE_HSTS_SECONDS = 31536000 # 1 year
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_PRELOAD = True
 

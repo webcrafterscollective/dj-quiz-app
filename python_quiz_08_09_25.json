@@ -1,0 +1,262 @@
+{
+    "quizzes": [
+        {
+            "title": "Intermediate Python Fundamentals",
+            "time_limit_minutes": 20,
+            "questions": [
+                {
+                    "question_text": "What is the output of the following list comprehension: [x*x for x in range(5) if x % 2 == 0]?",
+                    "question_type": "MCQ",
+                    "points": 5,
+                    "choices": [
+                        {
+                            "choice_text": "[0, 4, 16]",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "[0, 1, 4, 9, 16]",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "[0, 2, 4]",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "A syntax error",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "question_text": "In a function definition, what is the primary purpose of **kwargs?",
+                    "question_type": "MCQ",
+                    "points": 5,
+                    "choices": [
+                        {
+                            "choice_text": "To accept a variable number of positional arguments.",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "To accept a variable number of keyword arguments.",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "To specify that the function can only accept keyword arguments.",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "To unpack a list of arguments.",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "question_text": "What is the difference between the 'is' and '==' operators in Python?",
+                    "question_type": "MCQ",
+                    "points": 5,
+                    "choices": [
+                        {
+                            "choice_text": "They are identical and can be used interchangeably.",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "'==' checks for equality of value, while 'is' checks for identity (same object in memory).",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "'is' checks for equality of value, while '==' checks for identity (same object in memory).",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "'is' is used for comparing strings, and '==' is for numbers.",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "question_text": "According to the LEGB rule, what is the first scope Python checks when looking for a variable?",
+                    "question_type": "MCQ",
+                    "points": 5,
+                    "choices": [
+                        {
+                            "choice_text": "Global",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "Built-in",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "Enclosing",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "Local",
+                            "is_correct": true
+                        }
+                    ]
+                },
+                {
+                    "question_text": "What will my_dict.get('key_that_does_not_exist', 'default_value') return if my_dict is an empty dictionary?",
+                    "question_type": "MCQ",
+                    "points": 5,
+                    "choices": [
+                        {
+                            "choice_text": "It will raise a KeyError.",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "None",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "'default_value'",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "False",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "question_text": "Which of the following data types are mutable in Python? (Select all that apply)",
+                    "question_type": "MSQ",
+                    "points": 10,
+                    "choices": [
+                        {
+                            "choice_text": "list",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "tuple",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "dict",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "str",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "set",
+                            "is_correct": true
+                        }
+                    ]
+                },
+                {
+                    "question_text": "Which of the following built-in functions return an iterator (are lazy)? (Select all that apply)",
+                    "question_type": "MSQ",
+                    "points": 10,
+                    "choices": [
+                        {
+                            "choice_text": "map()",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "list()",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "filter()",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "sorted()",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "zip()",
+                            "is_correct": true
+                        }
+                    ]
+                },
+                {
+                    "question_text": "Which of the following are valid ways to format strings in modern Python (3.6+)? (Select all that apply)",
+                    "question_type": "MSQ",
+                    "points": 10,
+                    "choices": [
+                        {
+                            "choice_text": "f-strings (e.g., f'Hello {name}')",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "The % operator (e.g., 'Hello %s' % name)",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "The .format() method (e.g., 'Hello {}'.format(name))",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "String concatenation with +",
+                            "is_correct": true
+                        }
+                    ]
+                },
+                {
+                    "question_text": "Which standard library modules are commonly used for interacting with the file system? (Select all that apply)",
+                    "question_type": "MSQ",
+                    "points": 10,
+                    "choices": [
+                        {
+                            "choice_text": "os",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "requests",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "pathlib",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "json",
+                            "is_correct": false
+                        },
+                        {
+                            "choice_text": "shutil",
+                            "is_correct": true
+                        }
+                    ]
+                },
+                {
+                    "question_text": "What are the valid clauses in a try...except block for handling exceptions? (Select all that apply)",
+                    "question_type": "MSQ",
+                    "points": 10,
+                    "choices": [
+                        {
+                            "choice_text": "try",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "except",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "else",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "finally",
+                            "is_correct": true
+                        },
+                        {
+                            "choice_text": "catch",
+                            "is_correct": false
+                        }
+                    ]
+                },
+                {
+                    "question_text": "Write a Python function find_most_frequent(numbers) that takes a list of integers. The function should return a tuple of two integers: (number, frequency). number is the most frequent number in the list, and frequency is how many times it appeared. If there is a tie for the most frequent number, return the one that is smaller.",
+                    "question_type": "CODE",
+                    "points": 25,
+                    "choices": []
+                }
+            ]
+        }
+    ]
+}
