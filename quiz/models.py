@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 class Quiz(models.Model):
@@ -59,6 +60,46 @@ class QuizSubmission(models.Model):
     def __str__(self):
         return f"{self.user.username}'s submission for {self.quiz.title}"
 
+    def grade_mcq_msq(self):
+        """
+        Grades all MCQ and MSQ answers for this submission, updates the score,
+        and sets the final status based on whether manual grading is required.
+        """
+        auto_graded_score = 0
+        has_manual_questions = False
+
+        for answer in self.answers.all():
+            question = answer.question
+            points = 0
+
+            if question.question_type == Question.QuestionType.MCQ:
+                correct_choice = question.choices.filter(is_correct=True).first()
+                user_choice = answer.selected_choices.first()
+                if correct_choice and user_choice and correct_choice.id == user_choice.id:
+                    points = question.points
+            
+            elif question.question_type == Question.QuestionType.MSQ:
+                correct_choices = set(question.choices.filter(is_correct=True).values_list('id', flat=True))
+                selected_choices = set(answer.selected_choices.values_list('id', flat=True))
+                if correct_choices == selected_choices and correct_choices: # Ensure not empty
+                    points = question.points
+
+            elif question.question_type == Question.QuestionType.CODING:
+                has_manual_questions = True
+            
+            answer.points_awarded = points
+            answer.save()
+            auto_graded_score += points
+
+        self.score = auto_graded_score
+        if has_manual_questions:
+            self.status = self.SubmissionStatus.SUBMITTED
+        else:
+            self.status = self.SubmissionStatus.COMPLETED
+        
+        self.end_time = timezone.now()
+        self.save()
+
     def calculate_final_score(self):
         """
         Calculates and RETURNS the score for the submission by summing up the points
@@ -82,4 +123,3 @@ class UserAnswer(models.Model):
 
     def __str__(self):
         return f"Answer for Q{self.question.order} in submission {self.submission.id}"
-
